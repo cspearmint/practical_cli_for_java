@@ -1,26 +1,30 @@
 package oop.project.cli;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+
 public class Command {
 
     String name;
-    private ArrayList<Argument> args;
-    private String help_message;
-    // storage for the function the user will call
+    private Map<String, Argument> args;
+    // private String help_message; // Commented out until needed
 
     public Command(String name) {
         this.name = name;
-        this.args = new ArrayList<>();
+        this.args = Collections.emptyMap();
     }
 
+    /*
+        Adds argument to map, overrides argument if one with same name already exists
+        Returns whether an argument with same name already exists in map
+     */
     public boolean addArgument(Argument arg) {
-        // using parameters yet undetermined
-        // initialize an argument object
-        // then add it to the args arraylist
-        return this.args.add(arg);
+        boolean exists = args.containsKey(arg.name);
+        this.args.put(arg.name, arg);
+        return exists;
     }
+
     public String getName() {
         return this.name;
     }
-
 
 }
