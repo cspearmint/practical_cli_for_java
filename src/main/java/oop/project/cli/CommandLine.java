@@ -15,16 +15,14 @@ public class CommandLine {
         // checked against the arguments in the ArrayList
         // then the function will be called
         List<String> in = new ArrayList<>(List.of(input.split(" "))); // This is some bs magic.
-
-        try {
-            Command c = command_list.get(in.getFirst());
-            in.removeFirst();
-        }
-        catch(Error e) {
+        
+        Command c = command_list.get(in.getFirst());
+        if(c == null) {
             System.out.println("Command '" + in.getFirst() + "' does not exist!");
             return;
         }
 
+        in.removeFirst();
         /*
         Once the Command.parseArguments(String[] args) is completed, this will take in
         the rest of the input from the List. If you wanted to implement differently,
