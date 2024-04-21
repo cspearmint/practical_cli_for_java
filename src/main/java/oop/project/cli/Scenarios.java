@@ -2,7 +2,9 @@ package oop.project.cli;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
+
 
 public class Scenarios {
 
@@ -37,9 +39,14 @@ public class Scenarios {
      *  - {@code right: <your integer type>}
      */
     private static Map<String, Object> add(String arguments) {
-        //TODO: Parse arguments and extract values.
-        int left = 0; //or BigInteger, etc.
-        int right = 0;
+        String[] parts = arguments.split(" ");
+
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("add command requires two arguments: left and right");
+        }
+
+        int left = Integer.parseInt(parts[0]); //or BigInteger, etc.
+        int right = Integer.parseInt(parts[1]);
         return Map.of("left", left, "right", right);
     }
 
@@ -50,22 +57,84 @@ public class Scenarios {
      *       this as a non-optional decimal value using a default of 0.0.
      *  - {@code right: <your decimal type>} (required)
      */
-    static Map<String, Object> sub(String arguments) {
-        //TODO: Parse arguments and extract values.
-        Optional<Double> left = Optional.empty();
-        double right = 0.0;
-        return Map.of("left", left, "right", right);
+    public static Map<String, Object> sub(String arguments) {
+        Map<String, Object> result = new HashMap<>();
+
+        String[] parts = arguments.split("\\s+");
+
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
+
+            if (part.startsWith("--")) {
+                String argumentName = part.substring(2); // Remove the "--"
+                if (i + 1 < parts.length) {
+                    String argumentValue = parts[i + 1];
+
+                    if (argumentName.equals("left")) {
+                        try {
+                            double leftValue = Double.parseDouble(argumentValue);
+                            result.put("left", leftValue);
+                        } catch (NumberFormatException e) {
+
+                            throw new IllegalArgumentException("Error: Invalid value for 'left' argument");
+                        }
+                    } else if (argumentName.equals("right")) {
+                        try {
+                            double rightValue = Double.parseDouble(argumentValue);
+                            result.put("right", rightValue);
+                        } catch (NumberFormatException e) {
+
+                            throw new IllegalArgumentException("Error: Invalid value for 'right' argument");
+                        }
+                    }
+                } else {
+                    // Handle missing value for the argument
+                    throw new IllegalArgumentException("Error: Missing value for argument '" + argumentName + "'");
+                }
+                i++;
+            } else throw new IllegalArgumentException("Error: Extraneous argument: " + parts[i]);
+        }
+
+        if (!result.containsKey("right")) {
+            throw new IllegalArgumentException("Error: 'right' argument is required");
+        }
+
+        if(!result.containsKey("left")) {
+            result.put("left", Optional.empty());
+        }
+
+        return result;
     }
+
+
+
 
     /**
      * Takes one positional argument:
      *  - {@code number: <your integer type>} where {@code number >= 0}
      */
-    static Map<String, Object> sqrt(String arguments) {
-        //TODO: Parse arguments and extract values.
-        int number = 0;
+    private static Map<String, Object> sqrt(String arguments) {
+
+        String[] parts = arguments.split(" ");
+
+        if(parts.length > 1) {
+            throw new IllegalArgumentException("Error: Too many arguments");
+        }
+
+        int number;
+        try {
+            number = Integer.parseInt(parts[0]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Error: Invalid value for argument");
+        }
+
+        if (number < 0) {
+            throw new IllegalArgumentException("Error: Square root command requires a non-negative number");
+        }
+
         return Map.of("number", number);
     }
+
 
     /**
      * Takes one positional argument:
@@ -75,7 +144,23 @@ public class Scenarios {
      */
     static Map<String, Object> calc(String arguments) {
         //TODO: Parse arguments and extract values.
+        String[] parts = arguments.split(" ");
+
+        if(parts.length != 1)
+            throw new IllegalArgumentException("Error: Invalid number of arguments");
+
         String subcommand = "";
+
+        switch(parts[0]) {
+            case "add":
+            case "sub":
+            case "sqrt":
+                subcommand = parts[0];
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid subcommand: " + parts[0]);
+        }
+
         return Map.of("subcommand", subcommand);
     }
 
@@ -87,8 +172,23 @@ public class Scenarios {
      *       out of the box and requires a custom type to be defined.
      */
     static Map<String, Object> date(String arguments) {
-        //TODO: Parse arguments and extract values.
-        LocalDate date = LocalDate.EPOCH;
+        // Split the arguments string by space
+        String[] parts = arguments.split(" ");
+
+        // Check if there is exactly one argument
+        if (parts.length != 1) {
+            throw new IllegalArgumentException("Invalid number of arguments for date command.");
+        }
+
+        // Parse the argument as a LocalDate
+        LocalDate date;
+        try {
+            date = LocalDate.parse(parts[0]);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid date format: " + parts[0]);
+        }
+
+        // Return the date as a Map
         return Map.of("date", date);
     }
 

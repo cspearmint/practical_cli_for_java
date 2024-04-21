@@ -69,6 +69,8 @@ public class ScenariosTests {
         public static Stream<Arguments> testSqrt() {
             return Stream.of(
                 Arguments.of("Valid", "sqrt 4", Map.of("number", 4)),
+                //Arguments.of("Extraneous Argument", "sqrt 4 5", Map.of("number", null)),
+                //Arguments.of("test", "sqrt 4.3", Map.of("number", null)),
                 Arguments.of("Imperfect Square", "sqrt 3", Map.of("number", 3)),
                 Arguments.of("Zero", "sqrt 0", Map.of("number", 0)),
                 Arguments.of("Negative", "sqrt -1", null)
