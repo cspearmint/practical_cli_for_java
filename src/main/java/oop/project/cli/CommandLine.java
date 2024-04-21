@@ -14,9 +14,9 @@ public class CommandLine {
         return;
     }
 
-    public boolean addCommand() {
+    public boolean addCommand(Command command) {
         // add a command created by the user
-        return true;
+        return command_list.put(command.getName(), command) != null;
     }
 
 
