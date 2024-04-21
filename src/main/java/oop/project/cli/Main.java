@@ -43,6 +43,7 @@ public class Main {
                 break;
             }
             try {
+                cli.parseCommand(input);
                 var result = Scenarios.parse(input);
                 System.out.println(result);
             } catch (Exception e) {
