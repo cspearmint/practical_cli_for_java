@@ -30,6 +30,7 @@ public class Main {
                 break;
             }
             try {
+                cli.parseCommand(input);
                 var result = Scenarios.parse(input);
                 String command = input.split(" ", 2)[0];
 

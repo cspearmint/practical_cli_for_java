@@ -16,6 +16,10 @@ public class Command {
         this.commandFunction = (map) -> {};
     }
 
+    /*
+        Adds argument to map, overrides argument if one with same name already exists
+        Returns whether an argument with same name already exists in map
+     */
     public boolean addArgument(Argument arg) {
         // using parameters yet undetermined
         // initialize an argument object
@@ -27,11 +31,11 @@ public class Command {
     public Argument getArgument(int i) {
         return args.get(i);
     }
+
     public String getName() {
 
         return this.name;
     }
-
 
     public void setCommandFunction(CommandFunction<Map<String, Object>> commandFunction) {
         this.commandFunction = commandFunction;
@@ -47,7 +51,5 @@ public class Command {
     public interface CommandFunction<T> {
         void execute(T parameters);
     }
-
-
 
 }
