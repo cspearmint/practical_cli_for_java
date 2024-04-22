@@ -18,6 +18,21 @@ public class Main {
         addCommand.addArgument(new Argument("right", "int"));
         cli.addCommand(addCommand);
 
+        addCommand.setCommandFunction((map) -> {
+            // Retrieve the values from the map entries
+
+            Integer value1 = (Integer) map.get(addCommand.getArgument(0).getName());
+            Integer value2 = (Integer) map.get(addCommand.getArgument(1).getName());
+
+            // Perform the addition if both values are present
+            if (value1 != null && value2 != null) {
+                int result = value1 + value2;
+                System.out.println("Result: " + result);
+            } else {
+                System.out.println("One or both keys not found in the map.");
+            }
+        });
+
         Command subCommand = new Command("sub");
         subCommand.addArgument(new Argument("left", "double"));
         subCommand.addArgument(new Argument("right", "double"));
@@ -35,6 +50,8 @@ public class Main {
         dateCommand.addArgument(new Argument("date", "LocalDate"));
         cli.addCommand(dateCommand);
 
+
+
         while (true) {
             System.out.print("> ");
             var input = scanner.nextLine();
@@ -44,7 +61,14 @@ public class Main {
             }
             try {
                 var result = Scenarios.parse(input);
-                System.out.println(result);
+                String command = input.split(" ", 2)[0];
+
+                switch (command) {
+                    case "add":
+                        addCommand.runCommand(result);
+                    break;
+                }
+                //System.out.println(result);
             } catch (Exception e) {
                 System.out.println("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
             }
