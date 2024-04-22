@@ -54,4 +54,9 @@ public class CommandLine {
     }
 
 
+    public Command getCommand(String name) {
+        return this.command_list.get(name);
+    }
+
+
 }
