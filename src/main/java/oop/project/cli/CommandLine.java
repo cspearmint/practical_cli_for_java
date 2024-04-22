@@ -1,17 +1,20 @@
 package oop.project.cli;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
 public class CommandLine {
     private Map<String, Command> commandMap = new HashMap<>();
 
+    /**
+     * Command tokenizer for extracting list of tokens from input string.
+     * A token is either a substring of non-whitespace characters or a
+     * substring of the form `"[^"]*"`.
+     * Here, whitespace refers to a space.
+     */
     private class CommandTokenizer {
         private final String input;
         private int ptr = 0;
@@ -82,6 +85,10 @@ public class CommandLine {
         }
     }
 
+    /**
+     * Executes command provided input string.
+     * @param input Command input string
+     */
     public void executeCommand(String input) {
         CommandTokenizer tokenizer = new CommandTokenizer(input);
         List<String> tokens = tokenizer.readTokens();
@@ -107,7 +114,7 @@ public class CommandLine {
         cmd.runCommand(argValues);
     }
 
-    public void executeHelpCommand(List<String> tokens) {
+    private void executeHelpCommand(List<String> tokens) {
         if (tokens.isEmpty()) {
             System.out.println("Commands:");
             for (String cmd : commandMap.keySet()) {
@@ -132,25 +139,22 @@ public class CommandLine {
         }
     }
 
-    public boolean addCommand(Command command) {
-        // add a command created by the user
-        try {
-            commandMap.put(command.getName(), command);
-        } catch(Error e) {
-            System.out.println("Error adding command: " + e.getMessage());
-            return false;
-        }
-
-        return true;
-
-        // return command_list.put(command.getName(), command) != null;
-        //return true;
+    /**
+     * Adds command to CLI
+     * @param command Command to add
+     * @return Command instance of existing command with same name if it exists or null otherwise
+     */
+    public Command addCommand(Command command) {
+        return commandMap.put(command.getName(), command);
     }
 
-
+    /**
+     * Retrieves command provided name
+     * @param name Name of command
+     * @return Command instance associated with provided name or null otherwise
+     */
     public Command getCommand(String name) {
         return this.commandMap.get(name);
     }
-
 
 }
