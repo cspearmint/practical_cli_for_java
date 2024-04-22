@@ -1,6 +1,8 @@
 package oop.project.cli;
 
 import java.util.Scanner;
+import java.util.Optional;
+import java.lang.Math;
 
 public class Main {
 
@@ -21,12 +23,12 @@ public class Main {
         addCommand.setCommandFunction((map) -> {
             // Retrieve the values from the map entries
 
-            Integer value1 = (Integer) map.get(addCommand.getArgument(0).getName());
-            Integer value2 = (Integer) map.get(addCommand.getArgument(1).getName());
+            Integer leftArg = (Integer) map.get(addCommand.getArgument(0).getName());
+            Integer rightArg = (Integer) map.get(addCommand.getArgument(1).getName());
 
             // Perform the addition if both values are present
-            if (value1 != null && value2 != null) {
-                int result = value1 + value2;
+            if (leftArg != null && rightArg != null) {
+                int result = leftArg + rightArg;
                 System.out.println("Result: " + result);
             } else {
                 System.out.println("One or both keys not found in the map.");
@@ -40,9 +42,21 @@ public class Main {
 
         subCommand.setCommandFunction((map) -> {
             // Retrieve the values from the map entries
+            Object leftArg = map.get(subCommand.getArgument(0).getName());
+            Object rightArg = map.get(subCommand.getArgument(1).getName());
 
-            Double value1 = (Double) map.get(subCommand.getArgument(0).getName());
-            Double value2 = (Double) map.get(subCommand.getArgument(1).getName());
+            Double value1;
+            Double value2;
+
+            // Check if value1 is an Optional and set it to 0.0 if it is
+            if ( leftArg  instanceof Optional<?>) {
+                Optional<?> optionalValue1 = (Optional<?>)  leftArg ;
+                value1 = optionalValue1.isPresent() ? (Double) optionalValue1.get() : 0.0;
+            } else {
+                value1 = (Double)  leftArg ;
+            }
+
+            value2 = (Double) rightArg;
 
             // Perform the subtraction if both values are present
             if (value1 != null && value2 != null) {
@@ -52,10 +66,18 @@ public class Main {
                 System.out.println("One or both keys not found in the map.");
             }
         });
-
         Command sqrtCommand = new Command("sqrt");
         sqrtCommand.addArgument(new Argument("number", "int"));
         cli.addCommand(sqrtCommand);
+
+        sqrtCommand.setCommandFunction((map) -> {
+            // Retrieve the values from the map entries
+            Integer number = (Integer) map.get(sqrtCommand.getArgument(0).getName());
+
+            double ans = Math.sqrt(number);
+
+            System.out.println("Result: "  + ans);
+        });
 
         Command calcCommand = new Command("calc");
         calcCommand.addArgument(new Argument("subcommand", "string"));
@@ -84,6 +106,9 @@ public class Main {
                         break;
                     case "sub":
                         subCommand.runCommand(result);
+                        break;
+                    case "sqrt":
+                        sqrtCommand.runCommand(result);
                         break;
                     default:
                         System.out.println("Invalid command");
