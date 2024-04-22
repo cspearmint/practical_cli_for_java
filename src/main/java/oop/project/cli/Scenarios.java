@@ -29,8 +29,34 @@ public class Scenarios {
             case "sqrt" -> sqrt(arguments);
             case "calc" -> calc(arguments);
             case "date" -> date(arguments);
+            case "help" -> help(arguments);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
+    }
+
+
+    private static Map<String, Object> help(String arguments) {
+        String[] parts = arguments.split(" ");
+
+        if (parts.length != 1) {
+            throw new IllegalArgumentException("help command requires 1 argument");
+        }
+
+        String help;
+
+        switch(parts[0]) {
+            case "list":
+            case "sub":
+            case "sqrt":
+            case "add":
+            case "calc":
+                help = parts[0];
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid argument: " + parts[0]);
+        }
+
+        return Map.of("helpWith", help);
     }
 
     /**

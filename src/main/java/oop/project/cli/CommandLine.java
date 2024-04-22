@@ -1,6 +1,9 @@
 package oop.project.cli;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,14 +18,14 @@ public class CommandLine {
         // checked against the arguments in the ArrayList
         // then the function will be called
         List<String> in = new ArrayList<>(List.of(input.split(" "))); // This is some bs magic.
-        
-        Command c = command_list.get(in.getFirst());
+
+        Command c = command_list.get(in.get(0));
         if(c == null) {
-            System.out.println("Command '" + in.getFirst() + "' does not exist!");
+            System.out.println("Command '" + in.get(0) + "' does not exist!");
             return;
         }
 
-        in.removeFirst();
+        in.remove(0);
         /*
         Once the Command.parseArguments(String[] args) is completed, this will take in
         the rest of the input from the List. If you wanted to implement differently,
@@ -48,6 +51,11 @@ public class CommandLine {
 
         // return command_list.put(command.getName(), command) != null;
         //return true;
+    }
+
+
+    public Command getCommand(String name) {
+        return this.command_list.get(name);
     }
 
 
