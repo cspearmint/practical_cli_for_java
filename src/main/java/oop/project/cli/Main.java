@@ -38,6 +38,21 @@ public class Main {
         subCommand.addArgument(new Argument("right", "double"));
         cli.addCommand(subCommand);
 
+        subCommand.setCommandFunction((map) -> {
+            // Retrieve the values from the map entries
+
+            Double value1 = (Double) map.get(subCommand.getArgument(0).getName());
+            Double value2 = (Double) map.get(subCommand.getArgument(1).getName());
+
+            // Perform the subtraction if both values are present
+            if (value1 != null && value2 != null) {
+                Double result = value1 - value2;
+                System.out.println("Result: " + result);
+            } else {
+                System.out.println("One or both keys not found in the map.");
+            }
+        });
+
         Command sqrtCommand = new Command("sqrt");
         sqrtCommand.addArgument(new Argument("number", "int"));
         cli.addCommand(sqrtCommand);
@@ -66,7 +81,12 @@ public class Main {
                 switch (command) {
                     case "add":
                         addCommand.runCommand(result);
-                    break;
+                        break;
+                    case "sub":
+                        subCommand.runCommand(result);
+                        break;
+                    default:
+                        System.out.println("Invalid command");
                 }
                 //System.out.println(result);
             } catch (Exception e) {
