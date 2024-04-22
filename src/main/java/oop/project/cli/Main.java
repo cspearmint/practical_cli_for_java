@@ -21,7 +21,7 @@ public class Main {
         cli.addCommand(createSqrtCommand());
         cli.addCommand(createCaclCommand());
         cli.addCommand(createDateCommand());
-        cli.addCommand(createHelpCommand());
+        // cli.addCommand(createHelpCommand());
 
         while (true) {
             System.out.print("> ");
@@ -41,26 +41,26 @@ public class Main {
                 //System.out.println(result);
                  */
             } catch (Exception e) {
-                System.out.println("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
+                System.out.println("Error: " + e.getClass().getName() + ": " + e.getMessage());
             }
         }
     }
 
     private static Command createDateCommand() {
         Command dateCommand = new Command("date");
-        dateCommand.addArgument(new Argument("date", "LocalDate"));
+        dateCommand.addArgument("date", "LocalDate");
         return dateCommand;
     }
 
     private static Command createCaclCommand() {
         Command calcCommand = new Command("calc");
-        calcCommand.addArgument(new Argument("subcommand", "string"));
+        calcCommand.addArgument("subcommand", "string");
         return calcCommand;
     }
 
     private static Command createSqrtCommand() {
         Command sqrtCommand = new Command("sqrt");
-        sqrtCommand.addArgument(new Argument("number", "int"));
+        sqrtCommand.addArgument("number", "int");
 
         sqrtCommand.setCommandFunction((map) -> {
             // Retrieve the values from the map entries
@@ -75,13 +75,13 @@ public class Main {
 
     private static Command createSubCommand() {
         Command subCommand = new Command("sub");
-        subCommand.addArgument(new Argument("left", "double"));
-        subCommand.addArgument(new Argument("right", "double"));
+        subCommand.addFlag("left", "double");
+        subCommand.addFlag("right", "double");
 
         subCommand.setCommandFunction((map) -> {
             // Retrieve the values from the map entries
-            Object leftArg = map.get(subCommand.getArgument(0).getName());
-            Object rightArg = map.get(subCommand.getArgument(1).getName());
+            Object leftArg = map.get("left");
+            Object rightArg = map.get("right");
 
             Double value1;
             Double value2;
@@ -109,8 +109,8 @@ public class Main {
 
     private static Command createAddCommand() {
         Command addCommand = new Command("add");
-        addCommand.addArgument(new Argument("left", "int"));
-        addCommand.addArgument(new Argument("right", "int"));
+        addCommand.addArgument("left", "int");
+        addCommand.addArgument("right", "int");
 
         addCommand.setCommandFunction((map) -> {
             // Retrieve the values from the map entries
@@ -129,9 +129,10 @@ public class Main {
         return addCommand;
     }
 
+    /*
     private static Command createHelpCommand() {
         Command helpCommand = new Command("help");
-        helpCommand.addArgument(new Argument("helpWith", "String"));
+        helpCommand.addArgument("helpWith", "String");
         helpCommand.setCommandFunction((map) -> {
             // Retrieve the values from the map entries
 
@@ -173,6 +174,7 @@ public class Main {
         System.out.println("date: Display the current date.");
         System.out.println("To get help for a specific command, use: help <commandName>");
     }
+    */
 }
 
 
