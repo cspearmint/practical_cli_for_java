@@ -1,5 +1,6 @@
 package oop.project.cli;
 
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Optional;
 import java.lang.Math;
@@ -30,13 +31,15 @@ public class Main {
                 break;
             }
             try {
-                cli.parseCommand(input);
+                cli.executeCommand(input);
+
+                /*
                 var result = Scenarios.parse(input);
                 String command = input.split(" ", 2)[0];
 
                 cli.getCommand(command).runCommand(result);
-
                 //System.out.println(result);
+                 */
             } catch (Exception e) {
                 System.out.println("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
             }

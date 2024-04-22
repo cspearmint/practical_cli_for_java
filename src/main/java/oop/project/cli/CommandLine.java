@@ -10,38 +10,102 @@ import java.util.Map;
 
 
 public class CommandLine {
-    private Map<String, Command> command_list = new HashMap<>();
+    private Map<String, Command> commandMap = new HashMap<>();
 
-    public void parseCommand(String input) {
-        // use Scenarios to parse input string into arguments
-        // these will be passed to  the command class and
-        // checked against the arguments in the ArrayList
-        // then the function will be called
-        List<String> in = new ArrayList<>(List.of(input.split(" "))); // This is some bs magic.
+    private class CommandTokenizer {
+        private String input;
+        private int ptr = 0;
 
-        Command c = command_list.get(in.get(0));
-        if(c == null) {
-            System.out.println("Command '" + in.get(0) + "' does not exist!");
+        public CommandTokenizer(String input) {
+            this.input = input;
+        }
+
+        public List<String> readTokens() {
+            List<String> tokens = new ArrayList<>();
+            while (!isEof()) {
+                String token = readNextToken();
+                if (token != null) {
+                    tokens.add(token);
+                }
+            }
+            return tokens;
+        }
+
+        private String readNextToken() {
+            readWhitespace();
+            if (isEof()) {
+                return null;
+            }
+            int tokenStart = getPos();
+            if (peek() == '\"') {
+                // Token is a string type so read until next double quote.
+                while (!isEof() && peek() != '\"') {
+                    next();
+                }
+                if (peek() != '\"') {
+                    throw new RuntimeException("Expected '\"', got eof");
+                }
+                next();
+            }
+            else {
+                while (!isEof() && !isWhitespace(peek())) {
+                    next();
+                }
+            }
+            return input.substring(tokenStart, getPos());
+        }
+
+        private int getPos() {
+            return ptr;
+        }
+
+        private boolean isEof() {
+            return ptr >= input.length();
+        }
+
+        private boolean isWhitespace(char c) {
+            return c == ' ';
+        }
+
+        private char peek() {
+            return input.charAt(ptr);
+        }
+
+        private void next() {
+            ptr++;
+        }
+
+        private void readWhitespace() {
+            while (!isEof() && isWhitespace(peek())) {
+                next();
+            }
+        }
+    }
+
+    public void executeCommand(String input) {
+        CommandTokenizer tokenizer = new CommandTokenizer(input);
+        List<String> tokens = tokenizer.readTokens();
+
+        if (tokens.isEmpty()) {
+            throw new RuntimeException("Expected command, got nothing");
+        }
+
+        Command cmd = commandMap.get(tokens.getFirst());
+        if (cmd == null) {
+            System.out.println("Command '" + tokens.getFirst() + "' does not exist!");
             return;
         }
 
-        in.remove(0);
-        /*
-        Once the Command.parseArguments(String[] args) is completed, this will take in
-        the rest of the input from the List. If you wanted to implement differently,
-        feel free to change this around.
-            c.parseArguments(in);
-         */
+        tokens.remove(0);
+        Map<String, Object> argValues = cmd.parseArguments(tokens);
 
-        /*
-         */
-        System.out.println("Command works!");
+        cmd.runCommand(argValues);
     }
 
     public boolean addCommand(Command command) {
         // add a command created by the user
         try {
-            command_list.put(command.getName(), command);
+            commandMap.put(command.getName(), command);
         } catch(Error e) {
             System.out.println("Error adding command: " + e.getMessage());
             return false;
@@ -55,7 +119,7 @@ public class CommandLine {
 
 
     public Command getCommand(String name) {
-        return this.command_list.get(name);
+        return this.commandMap.get(name);
     }
 
 
