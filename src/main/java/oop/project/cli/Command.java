@@ -9,14 +9,18 @@ public class Command {
     private ArrayList<Argument> args;
 
     private Map<String, Argument> flags = new HashMap<String, Argument>();
-    private String help_message;
+    private String helpMessage;
     private CommandFunction commandFunction;
 
-    // storage for the function the user will call
     public Command(String name) {
+        this(name, null);
+    }
+
+    public Command(String name, String helpMessage) {
         this.name = name;
         this.args = new ArrayList<>();
         this.commandFunction = (map) -> {};
+        this.helpMessage = helpMessage;
     }
 
     /*
@@ -40,8 +44,15 @@ public class Command {
     }
 
     public String getName() {
-
         return this.name;
+    }
+
+    public String getHelpMessage() {
+        return this.helpMessage;
+    }
+
+    public void setHelpMessage(String helpMessage) {
+        this.helpMessage = helpMessage;
     }
 
     public void setCommandFunction(CommandFunction<Map<String, Object>> commandFunction) {

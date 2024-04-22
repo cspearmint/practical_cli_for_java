@@ -21,7 +21,7 @@ public class Main {
         cli.addCommand(createSqrtCommand());
         cli.addCommand(createCaclCommand());
         cli.addCommand(createDateCommand());
-        cli.addCommand(createHelpCommand());
+        // cli.addCommand(createHelpCommand());
 
         while (true) {
             System.out.print("> ");
@@ -41,7 +41,7 @@ public class Main {
                 //System.out.println(result);
                  */
             } catch (Exception e) {
-                System.out.println("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
+                System.out.println("Error: " + e.getClass().getName() + ": " + e.getMessage());
             }
         }
     }
@@ -75,13 +75,13 @@ public class Main {
 
     private static Command createSubCommand() {
         Command subCommand = new Command("sub");
-        subCommand.addArgument("left", "double");
-        subCommand.addArgument("right", "double");
+        subCommand.addFlag("left", "double");
+        subCommand.addFlag("right", "double");
 
         subCommand.setCommandFunction((map) -> {
             // Retrieve the values from the map entries
-            Object leftArg = map.get(subCommand.getArgument(0).getName());
-            Object rightArg = map.get(subCommand.getArgument(1).getName());
+            Object leftArg = map.get("left");
+            Object rightArg = map.get("right");
 
             Double value1;
             Double value2;
@@ -129,6 +129,7 @@ public class Main {
         return addCommand;
     }
 
+    /*
     private static Command createHelpCommand() {
         Command helpCommand = new Command("help");
         helpCommand.addArgument("helpWith", "String");
@@ -173,6 +174,7 @@ public class Main {
         System.out.println("date: Display the current date.");
         System.out.println("To get help for a specific command, use: help <commandName>");
     }
+    */
 }
 
 
