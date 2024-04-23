@@ -21,7 +21,6 @@ public class Main {
         cli.addCommand(createSqrtCommand());
         cli.addCommand(createCaclCommand());
         cli.addCommand(createDateCommand());
-        // cli.addCommand(createHelpCommand());
 
         while (true) {
             System.out.print("> ");
@@ -47,134 +46,82 @@ public class Main {
     }
 
     private static Command createDateCommand() {
-        Command dateCommand = new Command("date");
-        dateCommand.addArgument("date", "LocalDate");
-        return dateCommand;
+        return Command.builder("date")
+                .addArgument("date", "LocalDate")
+                .build();
     }
 
     private static Command createCaclCommand() {
-        Command calcCommand = new Command("calc");
-        calcCommand.addArgument("subcommand", "string");
-        return calcCommand;
+        return Command.builder("calc")
+                .addArgument("subcommand", "string")
+                .build();
     }
 
     private static Command createSqrtCommand() {
-        Command sqrtCommand = new Command("sqrt");
-        sqrtCommand.addArgument("number", "int");
+        return Command.builder("sqrt")
+                .addArgument("number", "int")
+                .withCommandFunction((map) -> {
+                    // Retrieve the values from the map entries
+                    Integer number = (Integer) map.get("number");
 
-        sqrtCommand.setCommandFunction((map) -> {
-            // Retrieve the values from the map entries
-            Integer number = (Integer) map.get(sqrtCommand.getArgument(0).getName());
-
-            double ans = Math.sqrt(number);
-
-            System.out.println("Result: "  + ans);
-        });
-        return sqrtCommand;
+                    double ans = Math.sqrt(number);
+                    System.out.println("Result: "  + ans);
+                })
+                .build();
     }
 
     private static Command createSubCommand() {
-        Command subCommand = new Command("sub");
-        subCommand.addFlag("left", "double");
-        subCommand.addFlag("right", "double");
+        return Command.builder("sub")
+                .addFlag("left", "double")
+                .addFlag("right", "double")
+                .withCommandFunction((map) -> {
+                    // Retrieve the values from the map entries
+                    Object leftArg = map.get("left");
+                    Object rightArg = map.get("right");
 
-        subCommand.setCommandFunction((map) -> {
-            // Retrieve the values from the map entries
-            Object leftArg = map.get("left");
-            Object rightArg = map.get("right");
+                    Double value1;
+                    Double value2;
 
-            Double value1;
-            Double value2;
+                    // Check if value1 is an Optional and set it to 0.0 if it is
+                    if ( leftArg  instanceof Optional<?>) {
+                        Optional<?> optionalValue1 = (Optional<?>)  leftArg ;
+                        value1 = optionalValue1.isPresent() ? (Double) optionalValue1.get() : 0.0;
+                    } else {
+                        value1 = (Double)  leftArg ;
+                    }
 
-            // Check if value1 is an Optional and set it to 0.0 if it is
-            if ( leftArg  instanceof Optional<?>) {
-                Optional<?> optionalValue1 = (Optional<?>)  leftArg ;
-                value1 = optionalValue1.isPresent() ? (Double) optionalValue1.get() : 0.0;
-            } else {
-                value1 = (Double)  leftArg ;
-            }
+                    value2 = (Double) rightArg;
 
-            value2 = (Double) rightArg;
-
-            // Perform the subtraction if both values are present
-            if (value1 != null && value2 != null) {
-                Double result = value1 - value2;
-                System.out.println("Result: " + result);
-            } else {
-                System.out.println("One or both keys not found in the map.");
-            }
-        });
-        return subCommand;
+                    // Perform the subtraction if both values are present
+                    if (value1 != null && value2 != null) {
+                        Double result = value1 - value2;
+                        System.out.println("Result: " + result);
+                    } else {
+                        System.out.println("One or both keys not found in the map.");
+                    }
+                })
+                .build();
     }
 
     private static Command createAddCommand() {
-        Command addCommand = new Command("add");
-        addCommand.addArgument("left", "int");
-        addCommand.addArgument("right", "int");
+        return Command.builder("add")
+                .addFlag("left", "int")
+                .addFlag("right", "int")
+                .withCommandFunction((map) -> {
+                    // Retrieve the values from the map entries
+                    Integer leftArg = (Integer) map.get("left");
+                    Integer rightArg = (Integer) map.get("right");
 
-        addCommand.setCommandFunction((map) -> {
-            // Retrieve the values from the map entries
-
-            Integer leftArg = (Integer) map.get(addCommand.getArgument(0).getName());
-            Integer rightArg = (Integer) map.get(addCommand.getArgument(1).getName());
-
-            // Perform the addition if both values are present
-            if (leftArg != null && rightArg != null) {
-                int result = leftArg + rightArg;
-                System.out.println("Result: " + result);
-            } else {
-                System.out.println("One or both keys not found in the map.");
-            }
-        });
-        return addCommand;
+                    // Perform the addition if both values are present
+                    if (leftArg != null && rightArg != null) {
+                        int result = leftArg + rightArg;
+                        System.out.println("Result: " + result);
+                    } else {
+                        System.out.println("One or both keys not found in the map.");
+                    }
+                })
+                .build();
     }
-
-    /*
-    private static Command createHelpCommand() {
-        Command helpCommand = new Command("help");
-        helpCommand.addArgument("helpWith", "String");
-        helpCommand.setCommandFunction((map) -> {
-            // Retrieve the values from the map entries
-
-            String helpWith = (String) map.get(helpCommand.getArgument(0).getName());
-
-            switch (helpWith) {
-                case "list":
-                    listCommands();
-                    break;
-                case "add":
-                    System.out.println("add: Add two numbers. Usage: add <left> <right>");
-                    break;
-                case "sub":
-                    System.out.println("sub: Subtract two numbers. Usage: sub --left <left_value> --right <right_value>");
-                    break;
-                case "sqrt":
-                    System.out.println("sqrt: Calculate the square root of a number. Usage: sqrt <number>");
-                    break;
-                case "calc":
-                    System.out.println("calc: Perform a calculation. Usage: calc <subcommand> (add/sub/sqrt)");
-                    break;
-                case "date":
-                    System.out.println("date: Display the current date. Usage: date <YYYY-MM-DD>");
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid argument: " + helpWith);
-            }
-
-        });
-        return helpCommand;
-    }
-
-    public static void listCommands() {
-        System.out.println("Available commands:");
-        System.out.println("add: Add two numbers.");
-        System.out.println("sub: Subtract two numbers.");
-        System.out.println("sqrt: Calculate the square root of a number.");
-        System.out.println("calc: Perform a calculation.");
-        System.out.println("date: Display the current date.");
-        System.out.println("To get help for a specific command, use: help <commandName>");
-    }
-    */
 }
 
 

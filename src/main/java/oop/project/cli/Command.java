@@ -3,62 +3,107 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 public class Command {
-
-    String name;
-    private ArrayList<Argument> args;
-
-    private Map<String, Argument> flags = new HashMap<String, Argument>();
+    public final String name;
+    private final ArrayList<Argument> args;
+    private final Map<String, Argument> flags;
+    private final CommandFunction commandFunction;
     private String helpMessage;
-    private CommandFunction commandFunction;
 
-    public Command(String name) {
-        this(name, null);
-    }
-
-    public Command(String name, String helpMessage) {
+    private Command(String name, ArrayList<Argument> args, Map<String, Argument> flags,
+                    CommandFunction commandFunction, String helpMessage) {
         this.name = name;
-        this.args = new ArrayList<>();
-        this.commandFunction = (map) -> {};
+        this.args = args;
+        this.flags = flags;
+        this.commandFunction = commandFunction;
         this.helpMessage = helpMessage;
     }
 
-    /*
-        Adds argument to map, overrides argument if one with same name already exists
-        Returns whether an argument with same name already exists in map
+    /**
+     * Builder for Command
      */
-    public boolean addArgument(String name, String type) {
-        var arg = new Argument(name, type, false);
-        this.args.add(arg);
-        return true;
+    public static class Builder {
+        private String name;
+        private ArrayList<Argument> args;
+        private Map<String, Argument> flags;
+        private CommandFunction commandFunction;
+        private String helpMessage;
+
+        public Builder(String name) {
+            this.name = name;
+            this.args = new ArrayList<>();
+            this.flags = new HashMap<String, Argument>();
+            this.commandFunction = (map) -> {};
+            this.helpMessage = null;
+        }
+
+        public Builder addArgument(String name, String type) {
+            var arg = new Argument(name, type, false);
+            this.args.add(arg);
+            return this;
+        }
+
+        public Builder addFlag(String name, String type) {
+            var arg = new Argument(name, type, true);
+            this.flags.put(name, arg);
+            return this;
+        }
+
+        public Builder withCommandFunction(CommandFunction<Map<String, Object>> commandFunction) {
+            this.commandFunction = commandFunction;
+            return this;
+        }
+
+        public Builder withHelpMessage(String helpMessage) {
+            this.helpMessage = helpMessage;
+            return this;
+        }
+
+        public Command build() {
+            return new Command(name, args, flags, commandFunction, helpMessage);
+        }
     }
 
-    public boolean addFlag(String name, String type) {
-        var arg = new Argument(name, type, true);
-        this.flags.put(name, arg);
-        return true;
+    /**
+     * Create builder for Command instance
+     * @param name Command name
+     * @return
+     */
+    public static Builder builder(String name) {
+        return new Builder(name);
     }
 
+    /**
+     * Get argument at index i
+     * @param i Index of argument
+     * @return Argument instance
+     */
     public Argument getArgument(int i) {
         return args.get(i);
     }
 
+    /**
+     * Retrieves command name
+     * @return Command name string
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Retrieves command help message
+     * @return Help message string or null if no help message was set
+     */
     public String getHelpMessage() {
         return this.helpMessage;
     }
 
-    public void setHelpMessage(String helpMessage) {
-        this.helpMessage = helpMessage;
-    }
-
-    public void setCommandFunction(CommandFunction<Map<String, Object>> commandFunction) {
-        this.commandFunction = commandFunction;
-    }
-
+    /**
+     * Parse string list of argument tokens into a map
+     * @param space_parsed_args List of argument tokens
+     * @return Map with keys as argument names and values as corresponding argument values
+     */
     public Map<String, Object> parseArguments(List<String> space_parsed_args) {
         Map<String, Object> result = new HashMap<>();
         var pos_index = 0;
@@ -136,6 +181,10 @@ public class Command {
         return result;
     }
 
+    /**
+     * Execute command
+     * @param map Map of argument values with keys as argument names
+     */
     public void runCommand(Map<String, Object> map) {
         if (commandFunction != null) {
             commandFunction.execute(map);
