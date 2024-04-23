@@ -89,7 +89,7 @@ public class CommandLine {
      * Executes command provided input string.
      * @param input Command input string
      */
-    public void executeCommand(String input) {
+    public Map<String, Object> executeCommand(String input) {
         CommandTokenizer tokenizer = new CommandTokenizer(input);
         List<String> tokens = tokenizer.readTokens();
 
@@ -102,7 +102,7 @@ public class CommandLine {
 
         if (cmdName.equals("help")) {
             executeHelpCommand(tokens);
-            return;
+            return null;
         }
 
         Command cmd = commandMap.get(cmdName);
@@ -112,6 +112,7 @@ public class CommandLine {
 
         Map<String, Object> argValues = cmd.parseArguments(tokens);
         cmd.runCommand(argValues);
+        return argValues;
     }
 
     private void executeHelpCommand(List<String> tokens) {

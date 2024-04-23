@@ -99,6 +99,7 @@ public class Command {
         return this.helpMessage;
     }
 
+
     /**
      * Parse string list of argument tokens into a map
      * @param space_parsed_args List of argument tokens
@@ -139,8 +140,7 @@ public class Command {
                                 break;
                             }
                             default:
-                                System.out.println("Unsupported argument type: " + arg.getType());
-                                break;
+                                throw new IllegalArgumentException("Unsupported argument type: " + arg.getType());
                         }
                     }
 
@@ -172,8 +172,7 @@ public class Command {
                         break;
                     }
                     default:
-                        System.out.println("Unsupported argument type: " + arg.getType());
-                        break;
+                        throw new IllegalArgumentException("Unsupported argument type: " + arg.getType());
                 }
                 pos_index++;
             }
@@ -181,11 +180,30 @@ public class Command {
         return result;
     }
 
+
     /**
      * Execute command
      * @param map Map of argument values with keys as argument names
      */
     public void runCommand(Map<String, Object> map) {
+        boolean allKeysPresent = true;
+        for (Argument key : this.args) {
+            if (!map.containsKey(key.getName())) {
+                allKeysPresent = false;
+                break; // No need to continue checking if one key is missing
+            }
+        }
+        for (Argument key : this.flags.values()) {
+            if (!map.containsKey(key.getName())) {
+                allKeysPresent = false;
+                break; // No need to continue checking if one key is missing
+            }
+        }
+
+        // Output the result
+        if (!allKeysPresent) {
+          throw new RuntimeException("Missing arguments!");
+        }
         if (commandFunction != null) {
             commandFunction.execute(map);
         }

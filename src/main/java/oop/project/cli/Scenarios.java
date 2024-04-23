@@ -22,41 +22,24 @@ public class Scenarios {
         //need to adjust this a bit to work as expected.
         var split = command.split(" ", 2);
         var base = split[0];
-        var arguments = split.length == 2 ? split[1] : "";
+        // var arguments = split.length == 2 ? split[1] : "";
         return switch (base) {
-            case "add" -> add(arguments);
-            case "sub" -> sub(arguments);
-            case "sqrt" -> sqrt(arguments);
-            case "calc" -> calc(arguments);
-            case "date" -> date(arguments);
-            case "help" -> help(arguments);
+            case "add" -> add(command);
+            case "sub" -> sub(command);
+            case "sqrt" -> sqrt(command);
+            case "calc" -> calc(command);
+            case "date" -> date(command);
+            // case "help" -> help(command);
             default -> throw new IllegalArgumentException("Unknown command.");
         };
     }
 
-
+    /*
     private static Map<String, Object> help(String arguments) {
-        String[] parts = arguments.split(" ");
-
-        if (parts.length != 1) {
-            throw new IllegalArgumentException("help command requires 1 argument");
-        }
-
-        String help;
-
-        switch(parts[0]) {
-            case "list":
-            case "sub":
-            case "sqrt":
-            case "add":
-            case "calc":
-                help = parts[0];
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid argument: " + parts[0]);
-        }
-
-        return Map.of("helpWith", help);
+        CommandLine cli = new CommandLine();
+        Command c = TestingSuite.createHelpCommand();
+        cli.addCommand(c);
+        return cli.executeCommand(arguments);
     }
 
     /**
@@ -65,15 +48,10 @@ public class Scenarios {
      *  - {@code right: <your integer type>}
      */
     private static Map<String, Object> add(String arguments) {
-        String[] parts = arguments.split(" ");
-
-        if (parts.length != 2) {
-            throw new IllegalArgumentException("add command requires two arguments: left and right");
-        }
-
-        int left = Integer.parseInt(parts[0]); //or BigInteger, etc.
-        int right = Integer.parseInt(parts[1]);
-        return Map.of("left", left, "right", right);
+        CommandLine cli = new CommandLine();
+        Command c = TestingSuite.createAddCommand();
+        cli.addCommand(c);
+        return cli.executeCommand(arguments);
     }
 
     /**
@@ -84,52 +62,10 @@ public class Scenarios {
      *  - {@code right: <your decimal type>} (required)
      */
     public static Map<String, Object> sub(String arguments) {
-        Map<String, Object> result = new HashMap<>();
-
-        String[] parts = arguments.split("\\s+");
-
-        for (int i = 0; i < parts.length; i++) {
-            String part = parts[i];
-
-            if (part.startsWith("--")) {
-                String argumentName = part.substring(2); // Remove the "--"
-                if (i + 1 < parts.length) {
-                    String argumentValue = parts[i + 1];
-
-                    if (argumentName.equals("left")) {
-                        try {
-                            double leftValue = Double.parseDouble(argumentValue);
-                            result.put("left", leftValue);
-                        } catch (NumberFormatException e) {
-
-                            throw new IllegalArgumentException("Error: Invalid value for 'left' argument");
-                        }
-                    } else if (argumentName.equals("right")) {
-                        try {
-                            double rightValue = Double.parseDouble(argumentValue);
-                            result.put("right", rightValue);
-                        } catch (NumberFormatException e) {
-
-                            throw new IllegalArgumentException("Error: Invalid value for 'right' argument");
-                        }
-                    }
-                } else {
-                    // Handle missing value for the argument
-                    throw new IllegalArgumentException("Error: Missing value for argument '" + argumentName + "'");
-                }
-                i++;
-            } else throw new IllegalArgumentException("Error: Extraneous argument: " + parts[i]);
-        }
-
-        if (!result.containsKey("right")) {
-            throw new IllegalArgumentException("Error: 'right' argument is required");
-        }
-
-        if(!result.containsKey("left")) {
-            result.put("left", Optional.empty());
-        }
-
-        return result;
+        CommandLine cli = new CommandLine();
+        Command c = TestingSuite.createSubCommand();
+        cli.addCommand(c);
+        return cli.executeCommand(arguments);
     }
 
 
@@ -140,25 +76,10 @@ public class Scenarios {
      *  - {@code number: <your integer type>} where {@code number >= 0}
      */
     private static Map<String, Object> sqrt(String arguments) {
-
-        String[] parts = arguments.split(" ");
-
-        if(parts.length > 1) {
-            throw new IllegalArgumentException("Error: Too many arguments");
-        }
-
-        int number;
-        try {
-            number = Integer.parseInt(parts[0]);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Error: Invalid value for argument");
-        }
-
-        if (number < 0) {
-            throw new IllegalArgumentException("Error: Square root command requires a non-negative number");
-        }
-
-        return Map.of("number", number);
+        CommandLine cli = new CommandLine();
+        Command c = TestingSuite.createSqrtCommand();
+        cli.addCommand(c);
+        return cli.executeCommand(arguments);
     }
 
 
@@ -169,25 +90,10 @@ public class Scenarios {
      *       may want to take advantage of this scenario for that.
      */
     static Map<String, Object> calc(String arguments) {
-        //TODO: Parse arguments and extract values.
-        String[] parts = arguments.split(" ");
-
-        if(parts.length != 1)
-            throw new IllegalArgumentException("Error: Invalid number of arguments");
-
-        String subcommand = "";
-
-        switch(parts[0]) {
-            case "add":
-            case "sub":
-            case "sqrt":
-                subcommand = parts[0];
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid subcommand: " + parts[0]);
-        }
-
-        return Map.of("subcommand", subcommand);
+        CommandLine cli = new CommandLine();
+        Command c = TestingSuite.createCalcCommand();
+        cli.addCommand(c);
+        return cli.executeCommand(arguments);
     }
 
     /**
@@ -198,24 +104,10 @@ public class Scenarios {
      *       out of the box and requires a custom type to be defined.
      */
     static Map<String, Object> date(String arguments) {
-        // Split the arguments string by space
-        String[] parts = arguments.split(" ");
-
-        // Check if there is exactly one argument
-        if (parts.length != 1) {
-            throw new IllegalArgumentException("Invalid number of arguments for date command.");
-        }
-
-        // Parse the argument as a LocalDate
-        LocalDate date;
-        try {
-            date = LocalDate.parse(parts[0]);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid date format: " + parts[0]);
-        }
-
-        // Return the date as a Map
-        return Map.of("date", date);
+        CommandLine cli = new CommandLine();
+        Command c = TestingSuite.createDateCommand();
+        cli.addCommand(c);
+        return cli.executeCommand(arguments);
     }
 
     //TODO: Add your own scenarios based on your software design writeup. You
